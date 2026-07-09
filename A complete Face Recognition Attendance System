@@ -1,0 +1,44 @@
+clc;
+clear;
+close all;
+
+disp('========================================');
+disp(' FACE RECOGNITION ATTENDANCE SYSTEM');
+disp('========================================');
+
+while true
+
+disp(' ');
+disp('1. Register New Student');
+disp('2. Train Face Database');
+disp('3. Take Attendance');
+disp('4. View Attendance');
+disp('5. Exit');
+
+choice = input('Enter your choice: ');
+
+switch choice
+
+case 1
+    registerFace();
+
+case 2
+    trainModel();
+
+case 3
+    recognizeFace();
+
+case 4
+    data = readtable('attendance.xlsx');
+    disp(data);
+
+case 5
+    disp('Thank You');
+    break;
+
+otherwise
+    disp('Invalid Choice');
+
+end
+
+end
