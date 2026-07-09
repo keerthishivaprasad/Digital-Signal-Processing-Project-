@@ -1,0 +1,132 @@
+clc;
+clear;
+close all;
+
+patients = {};
+doctors = {'Dr. Sharma','Dr. Reddy','Dr. Khan','Dr. Patel'};
+appointments = {};
+
+while true
+    clc;
+    disp('========================================');
+    disp('      HOSPITAL MANAGEMENT SYSTEM');
+    disp('========================================');
+    disp('1. Register Patient');
+    disp('2. View Patients');
+    disp('3. Book Appointment');
+    disp('4. View Appointments');
+    disp('5. Generate Bill');
+    disp('6. Exit');
+
+    choice = input('Enter your choice: ');
+
+    switch choice
+
+        case 1
+            name = input('Patient Name: ','s');
+            age = input('Age: ');
+            gender = input('Gender: ','s');
+            disease = input('Disease: ','s');
+
+            patients(end+1,:) = {name,age,gender,disease};
+
+            disp('Patient Registered Successfully');
+            pause;
+
+        case 2
+            clc;
+            disp('Patient List');
+            disp('-----------------------------------------');
+
+            if isempty(patients)
+                disp('No Patients Found');
+            else
+                for i=1:size(patients,1)
+                    fprintf('%d. %s | Age:%d | %s | %s\n',...
+                        i,...
+                        patients{i,1},...
+                        patients{i,2},...
+                        patients{i,3},...
+                        patients{i,4});
+                end
+            end
+            pause;
+
+        case 3
+            if isempty(patients)
+                disp('Register Patients First');
+                pause;
+                continue;
+            end
+
+            patient=input('Patient Name: ','s');
+
+            disp('Available Doctors');
+
+            for i=1:length(doctors)
+                fprintf('%d. %s\n',i,doctors{i});
+            end
+
+            d=input('Choose Doctor: ');
+            date=input('Appointment Date: ','s');
+
+            appointments(end+1,:)={patient,doctors{d},date};
+
+            disp('Appointment Booked');
+            pause;
+
+        case 4
+
+            clc;
+            disp('Appointments');
+
+            if isempty(appointments)
+                disp('No Appointments');
+            else
+                for i=1:size(appointments,1)
+                    fprintf('%d. %s --> %s --> %s\n',...
+                        i,...
+                        appointments{i,1},...
+                        appointments{i,2},...
+                        appointments{i,3});
+                end
+            end
+
+            pause;
+
+        case 5
+
+            patient=input('Patient Name: ','s');
+
+            consultation=500;
+            medicine=input('Medicine Charges: ');
+            lab=input('Lab Charges: ');
+            room=input('Room Charges: ');
+
+            total=consultation+medicine+lab+room;
+
+            fprintf('\n');
+            disp('------------- BILL --------------');
+            fprintf('Patient : %s\n',patient);
+            fprintf('Consultation : Rs %.2f\n',consultation);
+            fprintf('Medicine : Rs %.2f\n',medicine);
+            fprintf('Lab : Rs %.2f\n',lab);
+            fprintf('Room : Rs %.2f\n',room);
+            fprintf('-------------------------------\n');
+            fprintf('Total Bill : Rs %.2f\n',total);
+
+            pause;
+
+        case 6
+
+            disp('Thank You');
+            break;
+
+        otherwise
+
+            disp('Invalid Choice');
+            pause;
+
+    end
+
+end
