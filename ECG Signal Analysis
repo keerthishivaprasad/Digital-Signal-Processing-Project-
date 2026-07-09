@@ -1,0 +1,114 @@
+clc;
+clear;
+close all;
+
+%% ECG SIGNAL ANALYSIS PROJECT
+
+Fs = 360;              % Sampling Frequency
+T = 10;                % Duration (seconds)
+t = 0:1/Fs:T;
+
+%% Generate ECG-like Signal
+ecgSignal = 1.2*sin(2*pi*1.2*t) ...
+          + 0.25*sin(2*pi*2.5*t) ...
+          + 0.10*sin(2*pi*15*t);
+
+%% Add Noise
+noise = 0.3*randn(size(ecgSignal));
+noisyECG = ecgSignal + noise;
+
+%% Butterworth Low-Pass Filter
+fc = 20;
+[b,a] = butter(4,fc/(Fs/2),'low');
+filteredECG = filtfilt(b,a,noisyECG);
+
+%% Detect R Peaks
+threshold = 0.8*max(filteredECG);
+
+[peakValue,peakLocation] = findpeaks(filteredECG,...
+    'MinPeakHeight',threshold,...
+    'MinPeakDistance',round(0.5*Fs));
+
+%% Heart Rate Calculation
+RR = diff(peakLocation)/Fs;
+
+heartRate = 60/mean(RR);
+
+%% Display Information
+
+disp('===============================')
+disp(' ECG SIGNAL ANALYSIS ')
+disp('===============================')
+
+fprintf('Sampling Frequency : %d Hz\n',Fs);
+fprintf('Signal Length      : %.2f Seconds\n',T);
+fprintf('Detected R Peaks   : %d\n',length(peakLocation));
+fprintf('Estimated Heart Rate : %.2f BPM\n',heartRate);
+
+if heartRate < 60
+    disp('Condition : Bradycardia')
+elseif heartRate <=100
+    disp('Condition : Normal Heart Rate')
+else
+    disp('Condition : Tachycardia')
+end
+
+%% Plot ECG Signals
+
+figure;
+
+subplot(4,1,1)
+plot(t,ecgSignal,'b')
+title('Original ECG Signal')
+xlabel('Time (Seconds)')
+ylabel('Amplitude')
+grid on
+
+subplot(4,1,2)
+plot(t,noisyECG,'r')
+title('Noisy ECG Signal')
+xlabel('Time (Seconds)')
+ylabel('Amplitude')
+grid on
+
+subplot(4,1,3)
+plot(t,filteredECG,'k')
+title('Filtered ECG Signal')
+xlabel('Time (Seconds)')
+ylabel('Amplitude')
+grid on
+
+subplot(4,1,4)
+plot(t,filteredECG,'b')
+hold on
+plot(t(peakLocation),peakValue,'ro','MarkerFaceColor','r')
+title('Detected R Peaks')
+xlabel('Time (Seconds)')
+ylabel('Amplitude')
+grid on
+
+%% Frequency Analysis
+
+N = length(filteredECG);
+
+frequency = (0:N-1)*(Fs/N);
+
+FFT = abs(fft(filteredECG));
+
+figure
+plot(frequency,FFT)
+
+xlim([0 50])
+
+title('Frequency Spectrum of ECG')
+xlabel('Frequency (Hz)')
+ylabel('Magnitude')
+grid on
+
+%% Save Report
+
+result = table(heartRate,length(peakLocation));
+
+writetable(result,'ECG_Report.xlsx');
+
+disp('ECG Report Saved Successfully')
