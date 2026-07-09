@@ -1,0 +1,53 @@
+clc;
+clear;
+close all;
+
+disp('==========================================');
+disp(' SMART TRAFFIC MANAGEMENT SYSTEM');
+disp('==========================================');
+
+video = VideoReader('traffic.mp4');
+
+greenTime = 20;
+yellowTime = 5;
+redTime = 20;
+
+vehicleCount = 0;
+frameNumber = 0;
+
+while hasFrame(video)
+
+    frame = readFrame(video);
+    frameNumber = frameNumber + 1;
+
+    gray = rgb2gray(frame);
+
+    bw = imbinarize(gray,'adaptive');
+
+    bw = bwareaopen(bw,300);
+
+    vehicleCount = sum(bw(:))/1500;
+
+    if vehicleCount < 10
+        greenTime = 15;
+    elseif vehicleCount < 25
+        greenTime = 30;
+    else
+        greenTime = 45;
+    end
+
+    subplot(2,1,1)
+    imshow(frame)
+    title(['Frame : ',num2str(frameNumber)])
+
+    subplot(2,1,2)
+    imshow(bw)
+    title(['Estimated Vehicles : ',num2str(round(vehicleCount))])
+
+    drawnow;
+
+end
+
+disp('Simulation Completed');
+fprintf('Final Estimated Vehicles = %d\n',round(vehicleCount));
+fprintf('Green Signal Time = %d seconds\n',greenTime);
