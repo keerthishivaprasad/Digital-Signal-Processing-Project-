@@ -1,0 +1,98 @@
+% Digital Signal Processing Project
+% Signal Generation, Noise Addition, Filtering and FFT Analysis
+
+clc;
+clear;
+close all;
+
+% Parameters
+fs = 1000;              % Sampling Frequency
+t = 0:1/fs:1;           % Time Vector
+
+% Generate Original Signal
+f1 = 50;
+f2 = 120;
+signal = sin(2*pi*f1*t) + 0.5*sin(2*pi*f2*t);
+
+% Add Gaussian Noise
+noise = 0.4*randn(size(signal));
+noisySignal = signal + noise;
+
+% Design Low Pass Filter
+cutoff = 80;
+[b,a] = butter(4, cutoff/(fs/2), 'low');
+
+% Filter the Signal
+filteredSignal = filter(b, a, noisySignal);
+
+% FFT Analysis
+N = length(signal);
+
+originalFFT = abs(fft(signal))/N;
+noisyFFT = abs(fft(noisySignal))/N;
+filteredFFT = abs(fft(filteredSignal))/N;
+
+frequency = (0:N-1)*(fs/N);
+
+% Plot Results
+figure;
+
+subplot(3,2,1);
+plot(t, signal);
+title('Original Signal');
+xlabel('Time (s)');
+ylabel('Amplitude');
+grid on;
+
+subplot(3,2,2);
+plot(frequency, originalFFT);
+title('Original Signal FFT');
+xlabel('Frequency (Hz)');
+ylabel('Magnitude');
+xlim([0 250]);
+grid on;
+
+subplot(3,2,3);
+plot(t, noisySignal);
+title('Noisy Signal');
+xlabel('Time (s)');
+ylabel('Amplitude');
+grid on;
+
+subplot(3,2,4);
+plot(frequency, noisyFFT);
+title('Noisy Signal FFT');
+xlabel('Frequency (Hz)');
+ylabel('Magnitude');
+xlim([0 250]);
+grid on;
+
+subplot(3,2,5);
+plot(t, filteredSignal);
+title('Filtered Signal');
+xlabel('Time (s)');
+ylabel('Amplitude');
+grid on;
+
+subplot(3,2,6);
+plot(frequency, filteredFFT);
+title('Filtered Signal FFT');
+xlabel('Frequency (Hz)');
+ylabel('Magnitude');
+xlim([0 250]);
+grid on;
+
+% Calculate Performance Metrics
+mse = mean((signal - filteredSignal).^2);
+snrOriginal = snr(signal);
+snrNoisy = snr(noisySignal);
+snrFiltered = snr(filteredSignal);
+
+fprintf('Performance Analysis\n');
+fprintf('--------------------\n');
+fprintf('Mean Square Error = %.6f\n', mse);
+fprintf('Original Signal SNR = %.2f dB\n', snrOriginal);
+fprintf('Noisy Signal SNR = %.2f dB\n', snrNoisy);
+fprintf('Filtered Signal SNR = %.2f dB\n', snrFiltered);
+
+disp('Signal Processing Completed Successfully.');
