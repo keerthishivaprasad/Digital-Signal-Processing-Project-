@@ -1,0 +1,117 @@
+clc;
+clear;
+close all;
+
+%% TELECOM NETWORK PLANNING SIMULATION
+
+areaLength = 1000;
+areaWidth = 1000;
+
+numberOfBaseStations = 5;
+coverageRadius = 250;
+
+%% Generate Base Stations
+
+baseX = rand(1,numberOfBaseStations)*areaLength;
+baseY = rand(1,numberOfBaseStations)*areaWidth;
+
+%% Generate Mobile Users
+
+numberOfUsers = 200;
+
+userX = rand(1,numberOfUsers)*areaLength;
+userY = rand(1,numberOfUsers)*areaWidth;
+
+signalStrength = zeros(1,numberOfUsers);
+connectedTower = zeros(1,numberOfUsers);
+
+%% Calculate Signal Strength
+
+for i = 1:numberOfUsers
+
+    bestSignal = -Inf;
+
+    for j = 1:numberOfBaseStations
+
+        distance = sqrt((userX(i)-baseX(j))^2 + (userY(i)-baseY(j))^2);
+
+        if distance < 1
+            distance = 1;
+        end
+
+        pathLoss = 32.45 + 20*log10(distance/1000) + 20*log10(1800);
+
+        receivedPower = 43 - pathLoss;
+
+        if receivedPower > bestSignal
+            bestSignal = receivedPower;
+            connectedTower(i) = j;
+        end
+
+    end
+
+    signalStrength(i) = bestSignal;
+
+end
+
+%% Display Results
+
+figure;
+
+scatter(userX,userY,20,signalStrength,'filled');
+hold on;
+
+scatter(baseX,baseY,200,'r','filled');
+
+for i = 1:numberOfBaseStations
+    viscircles([baseX(i),baseY(i)],coverageRadius,...
+        'Color','b','LineStyle','--');
+end
+
+title('Telecom Network Planning');
+
+xlabel('Area X (m)');
+ylabel('Area Y (m)');
+
+colorbar;
+grid on;
+
+%% Statistics
+
+disp('--------------------------------------');
+disp('NETWORK STATISTICS');
+disp('--------------------------------------');
+
+fprintf('Total Base Stations : %d\n',numberOfBaseStations);
+fprintf('Total Users         : %d\n',numberOfUsers);
+
+fprintf('Average Signal Strength = %.2f dBm\n',mean(signalStrength));
+
+fprintf('Maximum Signal Strength = %.2f dBm\n',max(signalStrength));
+
+fprintf('Minimum Signal Strength = %.2f dBm\n',min(signalStrength));
+
+coverage = sum(signalStrength>-95);
+
+fprintf('Users in Coverage = %d\n',coverage);
+
+fprintf('Coverage Percentage = %.2f %%\n',coverage/numberOfUsers*100);
+
+%% Connected Users Per Tower
+
+figure;
+
+towerUsers = zeros(1,numberOfBaseStations);
+
+for i = 1:numberOfBaseStations
+    towerUsers(i) = sum(connectedTower==i);
+end
+
+bar(towerUsers);
+
+title('Users Connected to Each Base Station');
+
+xlabel('Base Station');
+ylabel('Connected Users');
+
+grid on;
