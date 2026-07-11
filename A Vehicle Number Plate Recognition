@@ -1,0 +1,102 @@
+A Vehicle Number Plate Recognition (VNPR/ANPR) system is a popular MATLAB project that uses image processing and OCR (Optical Character Recognition). A complete project usually consists of 800–2000+ lines spread across multiple files and uses the Image Processing Toolbox and Computer Vision Toolbox.
+
+Below is a simplified MATLAB program that reads a vehicle image, detects the number plate region, performs OCR, and displays the recognized text.
+
+clc;
+clear;
+close all;
+
+%% Vehicle Number Plate Recognition System
+
+% Read input image
+img = imread('car.jpg');
+
+figure;
+imshow(img);
+title('Original Image');
+
+%% Convert to Gray Scale
+gray = rgb2gray(img);
+
+%% Improve Contrast
+gray = adapthisteq(gray);
+
+%% Detect Edges
+edges = edge(gray,'Canny');
+
+figure;
+imshow(edges);
+title('Edge Detection');
+
+%% Morphological Operations
+se = strel('rectangle',[5 15]);
+
+dilated = imdilate(edges,se);
+
+filled = imfill(dilated,'holes');
+
+clean = bwareaopen(filled,500);
+
+figure;
+imshow(clean);
+title('Candidate Regions');
+
+%% Find Connected Components
+
+stats = regionprops(clean,'BoundingBox','Area');
+
+maxArea = 0;
+plateBox = [];
+
+for i = 1:length(stats)
+
+    box = stats(i).BoundingBox;
+    area = stats(i).Area;
+
+    ratio = box(3)/box(4);
+
+    if area > maxArea && ratio > 2 && ratio < 6
+
+        maxArea = area;
+        plateBox = box;
+
+    end
+
+end
+
+%% Crop Number Plate
+
+if isempty(plateBox)
+
+    disp('Number Plate Not Found');
+    return;
+
+end
+
+plate = imcrop(img,plateBox);
+
+figure;
+imshow(plate);
+title('Detected Number Plate');
+
+%% OCR Recognition
+
+result = ocr(plate);
+
+plateNumber = strtrim(result.Text);
+
+disp('=================================');
+disp('Vehicle Number Plate');
+disp('=================================');
+disp(plateNumber);
+
+%% Display Plate on Image
+
+output = insertObjectAnnotation(img,...
+    'rectangle',...
+    plateBox,...
+    plateNumber);
+
+figure;
+imshow(output);
+title('Recognized Number Plate');
