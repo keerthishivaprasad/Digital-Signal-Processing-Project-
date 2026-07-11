@@ -1,0 +1,198 @@
+Below is a Stock Market Analysis System in MATLAB. This project simulates stock prices, calculates common technical indicators (Moving Average, RSI, MACD), generates buy/sell signals, visualizes the data, and exports the results.
+
+clc;
+clear;
+close all;
+
+%% STOCK MARKET ANALYSIS SYSTEM
+
+days = 1:200;
+
+%% Generate Sample Stock Prices
+
+price = zeros(1,200);
+price(1)=100;
+
+for i=2:200
+    price(i)=price(i-1)+randn()*2;
+end
+
+volume = randi([5000 50000],1,200);
+
+%% Moving Average
+
+MA20 = movmean(price,20);
+MA50 = movmean(price,50);
+
+%% RSI Calculation
+
+change = diff(price);
+
+gain = max(change,0);
+loss = abs(min(change,0));
+
+avgGain = movmean(gain,14);
+avgLoss = movmean(loss,14);
+
+RS = avgGain./avgLoss;
+
+RSI = 100-(100./(1+RS));
+
+RSI = [NaN RSI];
+
+%% MACD
+
+EMA12 = movmean(price,12);
+EMA26 = movmean(price,26);
+
+MACD = EMA12-EMA26;
+
+Signal = movmean(MACD,9);
+
+%% Buy/Sell Signals
+
+buy = [];
+sell = [];
+
+for i=2:length(price)
+
+    if MA20(i)>MA50(i) && MA20(i-1)<=MA50(i-1)
+        buy=[buy i];
+    end
+
+    if MA20(i)<MA50(i) && MA20(i-1)>=MA50(i-1)
+        sell=[sell i];
+    end
+
+end
+
+%% Display Statistics
+
+disp('=====================================')
+disp(' STOCK MARKET ANALYSIS')
+disp('=====================================')
+
+fprintf('Latest Price : %.2f\n',price(end));
+
+fprintf('Highest Price : %.2f\n',max(price));
+
+fprintf('Lowest Price : %.2f\n',min(price));
+
+fprintf('Average Price : %.2f\n',mean(price));
+
+fprintf('Average Volume : %.0f\n',mean(volume));
+
+%% Plot Price
+
+figure
+
+subplot(3,1,1)
+
+plot(days,price,'b','LineWidth',2)
+
+hold on
+
+plot(days,MA20,'r','LineWidth',2)
+
+plot(days,MA50,'k','LineWidth',2)
+
+scatter(buy,price(buy),100,'g','filled')
+
+scatter(sell,price(sell),100,'r','filled')
+
+legend('Price','MA20','MA50','Buy','Sell')
+
+title('Stock Price Analysis')
+
+xlabel('Trading Day')
+
+ylabel('Price')
+
+grid on
+
+%% RSI
+
+subplot(3,1,2)
+
+plot(days,RSI,'m','LineWidth',2)
+
+hold on
+
+yline(70,'r--')
+
+yline(30,'g--')
+
+title('Relative Strength Index')
+
+xlabel('Trading Day')
+
+ylabel('RSI')
+
+grid on
+
+%% MACD
+
+subplot(3,1,3)
+
+plot(days,MACD,'b','LineWidth',2)
+
+hold on
+
+plot(days,Signal,'r','LineWidth',2)
+
+legend('MACD','Signal')
+
+title('MACD Indicator')
+
+xlabel('Trading Day')
+
+ylabel('Value')
+
+grid on
+
+%% Volume
+
+figure
+
+bar(days,volume)
+
+title('Trading Volume')
+
+xlabel('Trading Day')
+
+ylabel('Volume')
+
+grid on
+
+%% Price Prediction
+
+future = 201:210;
+
+prediction = mean(price(end-20:end))+randn(1,10);
+
+figure
+
+plot(days,price,'b','LineWidth',2)
+
+hold on
+
+plot(future,prediction,'r--*','LineWidth',2)
+
+title('Stock Price Prediction')
+
+xlabel('Trading Day')
+
+ylabel('Price')
+
+legend('Historical','Prediction')
+
+grid on
+
+%% Export Data
+
+T = table(days',price',volume',MA20',MA50',...
+'VariableNames',{'Day','Price','Volume','MA20','MA50'});
+
+writetable(T,'StockMarketReport.xlsx')
+
+disp('Report Saved Successfully')
