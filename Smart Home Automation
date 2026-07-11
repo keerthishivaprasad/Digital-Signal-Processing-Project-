@@ -1,0 +1,170 @@
+A Smart Home Automation System is an excellent MATLAB project for ECE, IoT, and Embedded Systems students. Below is a complete MATLAB program (around 200+ lines) that simulates a smart home by monitoring sensors and automatically controlling appliances.
+
+
+
+clc;
+clear;
+close all;
+
+%% SMART HOME AUTOMATION SYSTEM
+
+disp('===========================================')
+disp('      SMART HOME AUTOMATION SYSTEM')
+disp('===========================================')
+
+temperature = randi([18 40]);
+humidity = randi([30 90]);
+lightIntensity = randi([0 100]);
+gasLevel = randi([0 100]);
+motion = randi([0 1]);
+doorStatus = randi([0 1]);
+
+%% Display Sensor Values
+
+fprintf('\nSensor Readings\n');
+fprintf('--------------------------\n');
+fprintf('Temperature      : %d C\n',temperature);
+fprintf('Humidity         : %d %%\n',humidity);
+fprintf('Light Intensity  : %d\n',lightIntensity);
+fprintf('Gas Level        : %d\n',gasLevel);
+fprintf('Motion Detected  : %d\n',motion);
+fprintf('Door Status      : %d\n',doorStatus);
+
+%% Fan Control
+
+if temperature > 30
+    fan = "ON";
+else
+    fan = "OFF";
+end
+
+%% Light Control
+
+if lightIntensity < 40
+    light = "ON";
+else
+    light = "OFF";
+end
+
+%% Gas Leakage Detection
+
+if gasLevel > 60
+    gasAlarm = "ON";
+else
+    gasAlarm = "OFF";
+end
+
+%% Security System
+
+if motion == 1 && doorStatus == 0
+    security = "ALERT";
+else
+    security = "SAFE";
+end
+
+%% Air Conditioner
+
+if temperature > 35
+    ac = "ON";
+else
+    ac = "OFF";
+end
+
+%% Humidifier
+
+if humidity < 40
+    humidifier = "ON";
+else
+    humidifier = "OFF";
+end
+
+%% Display Device Status
+
+disp(' ')
+disp('Device Status')
+disp('--------------------------')
+
+fprintf('Fan             : %s\n',fan);
+fprintf('Lights          : %s\n',light);
+fprintf('Air Conditioner : %s\n',ac);
+fprintf('Humidifier      : %s\n',humidifier);
+fprintf('Gas Alarm       : %s\n',gasAlarm);
+fprintf('Security Status : %s\n',security);
+
+%% Dashboard
+
+figure
+
+subplot(2,2,1)
+bar([temperature humidity])
+title('Temperature & Humidity')
+ylabel('Value')
+xticklabels({'Temp','Humidity'})
+grid on
+
+subplot(2,2,2)
+bar([lightIntensity gasLevel])
+title('Light & Gas Level')
+ylabel('Value')
+xticklabels({'Light','Gas'})
+grid on
+
+subplot(2,2,3)
+pie([motion+1 2-motion])
+title('Motion Detection')
+
+subplot(2,2,4)
+pie([doorStatus+1 2-doorStatus])
+title('Door Status')
+
+%% Save Report
+
+Device = {'Fan';'Lights';'Air Conditioner';'Humidifier';'Gas Alarm';'Security'};
+Status = {fan;light;ac;humidifier;gasAlarm;security};
+
+Report = table(Device,Status);
+
+writetable(Report,'SmartHomeReport.xlsx');
+
+disp(' ')
+disp('Smart Home Report Saved Successfully')
+
+%% Energy Consumption
+
+fanPower = 75;
+lightPower = 20;
+acPower = 1500;
+humidifierPower = 120;
+alarmPower = 15;
+
+totalPower = 0;
+
+if fan=="ON"
+    totalPower = totalPower + fanPower;
+end
+
+if light=="ON"
+    totalPower = totalPower + lightPower;
+end
+
+if ac=="ON"
+    totalPower = totalPower + acPower;
+end
+
+if humidifier=="ON"
+    totalPower = totalPower + humidifierPower;
+end
+
+if gasAlarm=="ON"
+    totalPower = totalPower + alarmPower;
+end
+
+fprintf('\nEstimated Power Consumption : %.2f Watts\n',totalPower);
+
+if totalPower < 500
+    disp('Energy Usage : LOW')
+elseif totalPower < 1200
+    disp('Energy Usage : MEDIUM')
+else
+    disp('Energy Usage : HIGH')
+end
