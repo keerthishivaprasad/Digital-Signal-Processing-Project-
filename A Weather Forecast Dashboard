@@ -1,0 +1,193 @@
+A Weather Forecast Dashboard is an excellent MATLAB project for data visualization and analysis. Below is a complete MATLAB program (around 180+ lines) that generates weather data, analyzes it, and displays it using multiple graphs.
+
+
+clc;
+clear;
+close all;
+
+%% WEATHER FORECAST DASHBOARD
+
+days = 1:30;
+
+temperature = 28 + 5*sin(days/4) + randn(1,30);
+humidity = 60 + 15*sin(days/5) + randn(1,30);
+rainfall = abs(20*sin(days/6) + randn(1,30)*5);
+windSpeed = 8 + rand(1,30)*12;
+pressure = 1008 + randn(1,30)*3;
+
+%% Display Weather Table
+
+WeatherData = table(days',temperature',humidity',rainfall',windSpeed',pressure',...
+'VariableNames',{'Day','Temperature','Humidity','Rainfall','WindSpeed','Pressure'});
+
+disp(WeatherData);
+
+%% Statistics
+
+fprintf('\n========== WEATHER REPORT ==========\n');
+
+fprintf('Average Temperature : %.2f C\n',mean(temperature));
+fprintf('Maximum Temperature : %.2f C\n',max(temperature));
+fprintf('Minimum Temperature : %.2f C\n',min(temperature));
+
+fprintf('Average Humidity : %.2f %%\n',mean(humidity));
+fprintf('Average Rainfall : %.2f mm\n',mean(rainfall));
+fprintf('Average Wind Speed : %.2f km/h\n',mean(windSpeed));
+
+%% Temperature Plot
+
+figure;
+
+subplot(3,2,1)
+
+plot(days,temperature,'-or','LineWidth',2)
+
+title('Temperature')
+
+xlabel('Day')
+
+ylabel('Degree Celsius')
+
+grid on
+
+%% Humidity Plot
+
+subplot(3,2,2)
+
+plot(days,humidity,'-ob','LineWidth',2)
+
+title('Humidity')
+
+xlabel('Day')
+
+ylabel('%')
+
+grid on
+
+%% Rainfall
+
+subplot(3,2,3)
+
+bar(days,rainfall)
+
+title('Rainfall')
+
+xlabel('Day')
+
+ylabel('mm')
+
+grid on
+
+%% Wind Speed
+
+subplot(3,2,4)
+
+plot(days,windSpeed,'-og','LineWidth',2)
+
+title('Wind Speed')
+
+xlabel('Day')
+
+ylabel('km/h')
+
+grid on
+
+%% Pressure
+
+subplot(3,2,5)
+
+plot(days,pressure,'-om','LineWidth',2)
+
+title('Atmospheric Pressure')
+
+xlabel('Day')
+
+ylabel('hPa')
+
+grid on
+
+%% Combined Graph
+
+subplot(3,2,6)
+
+plot(days,temperature,'r','LineWidth',2)
+
+hold on
+
+plot(days,humidity/3,'b','LineWidth',2)
+
+plot(days,windSpeed,'g','LineWidth',2)
+
+legend('Temperature','Humidity/3','Wind')
+
+title('Weather Comparison')
+
+grid on
+
+%% Weather Prediction
+
+futureDays = 31:37;
+
+futureTemperature = predictTemperature(temperature);
+
+futureHumidity = predictHumidity(humidity);
+
+figure
+
+plot(days,temperature,'b','LineWidth',2)
+
+hold on
+
+plot(futureDays,futureTemperature,'r--*','LineWidth',2)
+
+title('Temperature Forecast')
+
+xlabel('Day')
+
+ylabel('Temperature')
+
+legend('Current','Forecast')
+
+grid on
+
+figure
+
+plot(days,humidity,'k','LineWidth',2)
+
+hold on
+
+plot(futureDays,futureHumidity,'g--o','LineWidth',2)
+
+title('Humidity Forecast')
+
+xlabel('Day')
+
+ylabel('Humidity')
+
+legend('Current','Forecast')
+
+grid on
+
+%% Save Report
+
+writetable(WeatherData,'Weather_Report.xlsx')
+
+disp('Weather Report Saved Successfully')
+
+%% Functions
+
+function future = predictTemperature(temp)
+
+avg = mean(temp(end-5:end));
+
+future = avg + randn(1,7);
+
+end
+
+function future = predictHumidity(h)
+
+avg = mean(h(end-5:end));
+
+future = avg + randn(1,7)*2;
+
+end
