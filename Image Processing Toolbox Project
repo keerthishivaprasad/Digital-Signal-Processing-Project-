@@ -1,0 +1,185 @@
+Below is a professional Image Processing Toolbox Project in MATLAB. This program performs multiple image processing operations, including grayscale conversion, histogram equalization, edge detection, filtering, thresholding, segmentation, and image rotation.
+
+clc;
+clear;
+close all;
+
+%% IMAGE PROCESSING TOOLBOX PROJECT
+
+disp('===========================================')
+disp(' IMAGE PROCESSING TOOLBOX PROJECT')
+disp('===========================================')
+
+%% Read Image
+
+img = imread('peppers.png');
+
+figure
+imshow(img)
+title('Original Image')
+
+%% Convert to Gray Scale
+
+gray = rgb2gray(img);
+
+figure
+imshow(gray)
+title('Gray Scale Image')
+
+%% Histogram
+
+figure
+imhist(gray)
+title('Histogram')
+
+%% Histogram Equalization
+
+equalized = histeq(gray);
+
+figure
+imshow(equalized)
+title('Histogram Equalized Image')
+
+%% Edge Detection
+
+edgeImage = edge(gray,'Canny');
+
+figure
+imshow(edgeImage)
+title('Canny Edge Detection')
+
+%% Noise Addition
+
+noisy = imnoise(gray,'gaussian',0,0.01);
+
+figure
+imshow(noisy)
+title('Gaussian Noise')
+
+%% Median Filtering
+
+filtered = medfilt2(noisy,[3 3]);
+
+figure
+imshow(filtered)
+title('Median Filter Output')
+
+%% Thresholding
+
+binary = imbinarize(filtered);
+
+figure
+imshow(binary)
+title('Binary Image')
+
+%% Morphological Operations
+
+se = strel('disk',3);
+
+dilate = imdilate(binary,se);
+
+erode = imerode(binary,se);
+
+figure
+
+subplot(1,2,1)
+imshow(dilate)
+title('Dilated Image')
+
+subplot(1,2,2)
+imshow(erode)
+title('Eroded Image')
+
+%% Image Rotation
+
+rotateImage = imrotate(img,45);
+
+figure
+imshow(rotateImage)
+title('Rotated Image')
+
+%% Resize
+
+resizeImage = imresize(img,[300 300]);
+
+figure
+imshow(resizeImage)
+title('Resized Image')
+
+%% RGB Channels
+
+R = img(:,:,1);
+G = img(:,:,2);
+B = img(:,:,3);
+
+figure
+
+subplot(1,3,1)
+imshow(R)
+title('Red Channel')
+
+subplot(1,3,2)
+imshow(G)
+title('Green Channel')
+
+subplot(1,3,3)
+imshow(B)
+title('Blue Channel')
+
+%% FFT Analysis
+
+F = fft2(gray);
+
+Fs = fftshift(F);
+
+Magnitude = log(abs(Fs)+1);
+
+figure
+imshow(mat2gray(Magnitude))
+title('FFT Magnitude Spectrum')
+
+%% Sobel Edge Detection
+
+sobel = edge(gray,'Sobel');
+
+figure
+imshow(sobel)
+title('Sobel Edge Detection')
+
+%% Prewitt Edge Detection
+
+prewitt = edge(gray,'Prewitt');
+
+figure
+imshow(prewitt)
+title('Prewitt Edge Detection')
+
+%% Roberts Edge Detection
+
+roberts = edge(gray,'Roberts');
+
+figure
+imshow(roberts)
+title('Roberts Edge Detection')
+
+%% Watershed Segmentation
+
+gradient = imgradient(gray);
+
+L = watershed(gradient);
+
+figure
+imagesc(L)
+title('Watershed Segmentation')
+colorbar
+
+%% Save Output Images
+
+imwrite(gray,'GrayImage.png');
+imwrite(edgeImage,'Edges.png');
+imwrite(filtered,'Filtered.png');
+imwrite(binary,'Binary.png');
+
+disp(' ')
+disp('Processing Completed Successfully')
+disp('Images Saved Successfully')
