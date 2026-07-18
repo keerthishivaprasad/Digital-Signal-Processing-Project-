@@ -1,0 +1,213 @@
+A Wireless Network Simulator is an excellent MATLAB project for ECE, Telecommunications, and Wireless Communication courses. It can simulate cell towers, mobile users, signal strength, path loss, SNR, and network coverage.
+
+clc;
+clear;
+close all;
+
+%% WIRELESS NETWORK SIMULATOR
+
+disp('=======================================');
+disp('      WIRELESS NETWORK SIMULATOR');
+disp('=======================================');
+
+%% Simulation Parameters
+
+areaX = 1000;
+areaY = 1000;
+
+numBS = 6;          % Base Stations
+numUsers = 200;
+
+frequency = 1800;   % MHz
+txPower = 43;       % dBm
+
+%% Generate Base Stations
+
+bsX = rand(1,numBS)*areaX;
+bsY = rand(1,numBS)*areaY;
+
+%% Generate Users
+
+userX = rand(1,numUsers)*areaX;
+userY = rand(1,numUsers)*areaY;
+
+signal = zeros(1,numUsers);
+distance = zeros(1,numUsers);
+tower = zeros(1,numUsers);
+snrValue = zeros(1,numUsers);
+
+noise = -100;
+
+%% Calculate Signal Strength
+
+for i=1:numUsers
+
+    bestPower = -200;
+
+    for j=1:numBS
+
+        d = sqrt((userX(i)-bsX(j))^2 + (userY(i)-bsY(j))^2);
+
+        if d<1
+            d=1;
+        end
+
+        pathLoss = 32.44 + 20*log10(frequency) + 20*log10(d/1000);
+
+        rxPower = txPower-pathLoss;
+
+        if rxPower>bestPower
+
+            bestPower=rxPower;
+
+            tower(i)=j;
+
+            distance(i)=d;
+
+        end
+
+    end
+
+    signal(i)=bestPower;
+
+    snrValue(i)=signal(i)-noise;
+
+end
+
+%% Coverage
+
+excellent = sum(signal>-70);
+good = sum(signal<=-70 & signal>-85);
+poor = sum(signal<=-85);
+
+coverage = excellent+good;
+
+%% Network Capacity
+
+capacity = numUsers*5;
+
+%% Display Statistics
+
+disp(' ')
+disp('NETWORK STATISTICS')
+
+fprintf('Area Size           : %d x %d meters\n',areaX,areaY);
+fprintf('Base Stations       : %d\n',numBS);
+fprintf('Users               : %d\n',numUsers);
+
+fprintf('Average Signal      : %.2f dBm\n',mean(signal));
+
+fprintf('Average Distance    : %.2f m\n',mean(distance));
+
+fprintf('Average SNR         : %.2f dB\n',mean(snrValue));
+
+fprintf('Coverage            : %.2f %%\n',coverage/numUsers*100);
+
+fprintf('Estimated Capacity  : %d Mbps\n',capacity);
+
+%% Network Map
+
+figure
+
+scatter(userX,userY,35,signal,'filled')
+
+hold on
+
+scatter(bsX,bsY,250,'r','filled')
+
+for i=1:numBS
+
+    viscircles([bsX(i),bsY(i)],200,'Color','b');
+
+end
+
+title('Wireless Network Coverage')
+
+xlabel('X Coordinate')
+
+ylabel('Y Coordinate')
+
+colorbar
+
+grid on
+
+%% Signal Strength
+
+figure
+
+histogram(signal)
+
+xlabel('Signal Strength (dBm)')
+
+ylabel('Users')
+
+title('Signal Distribution')
+
+grid on
+
+%% Connected Users
+
+usersPerTower=zeros(1,numBS);
+
+for i=1:numBS
+
+    usersPerTower(i)=sum(tower==i);
+
+end
+
+figure
+
+bar(usersPerTower)
+
+title('Users Connected To Each Base Station')
+
+xlabel('Tower Number')
+
+ylabel('Users')
+
+grid on
+
+%% Signal vs Distance
+
+figure
+
+scatter(distance,signal,40,'filled')
+
+xlabel('Distance (m)')
+
+ylabel('Signal Strength (dBm)')
+
+title('Signal Strength vs Distance')
+
+grid on
+
+%% SNR
+
+figure
+
+plot(sort(snrValue),'LineWidth',2)
+
+xlabel('User')
+
+ylabel('SNR (dB)')
+
+title('Signal To Noise Ratio')
+
+grid on
+
+%% User Report
+
+ID=(1:numUsers)';
+
+Report=table(ID,...
+distance',...
+signal',...
+snrValue',...
+tower',...
+'VariableNames',...
+{'UserID','Distance','Signal','SNR','Tower'});
+
+writetable(Report,'WirelessNetworkReport.xlsx');
+
+disp(' ')
+disp('Wireless Network Report Saved')
