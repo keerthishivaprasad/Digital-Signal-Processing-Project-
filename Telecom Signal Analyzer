@@ -1,0 +1,198 @@
+clc;
+clear;
+close all;
+
+%% =====================================
+% TELECOM SIGNAL ANALYZER
+%% =====================================
+
+Fs = 10000;             % Sampling Frequency
+Fc = 1000;              % Carrier Frequency
+Rb = 100;               % Bit Rate
+Tb = 1/Rb;
+N = 100;
+
+%% Generate Binary Data
+
+bits = randi([0 1],1,N);
+
+%% NRZ Encoding
+
+nrz = [];
+
+for i = 1:length(bits)
+
+    if bits(i)==1
+        nrz=[nrz ones(1,100)];
+    else
+        nrz=[nrz -ones(1,100)];
+    end
+
+end
+
+time=(0:length(nrz)-1)/Fs;
+
+%% Carrier
+
+carrier = cos(2*pi*Fc*time);
+
+%% BPSK Modulation
+
+bpsk = nrz .* carrier;
+
+%% AWGN Channel
+
+received = awgn(bpsk,15,'measured');
+
+%% Butterworth Filter
+
+[b,a]=butter(4,0.25);
+
+filtered=filtfilt(b,a,received);
+
+%% FFT
+
+NFFT=length(filtered);
+
+frequency=(-NFFT/2:NFFT/2-1)*(Fs/NFFT);
+
+FFT=fftshift(abs(fft(filtered)));
+
+%% Signal Power
+
+signalPower=bandpower(filtered);
+
+noisePower=bandpower(received-filtered);
+
+SNR=10*log10(signalPower/noisePower);
+
+%% BER
+
+sampled=filtered(50:100:end);
+
+detected=sampled>0;
+
+BER=sum(bits~=detected)/length(bits);
+
+%% Display Results
+
+disp('================================');
+
+disp('TELECOM SIGNAL ANALYZER');
+
+disp('================================');
+
+fprintf('Sampling Frequency : %.0f Hz\n',Fs);
+
+fprintf('Carrier Frequency : %.0f Hz\n',Fc);
+
+fprintf('Number of Bits : %d\n',N);
+
+fprintf('Signal Power : %.4f W\n',signalPower);
+
+fprintf('Noise Power : %.4f W\n',noisePower);
+
+fprintf('SNR : %.2f dB\n',SNR);
+
+fprintf('BER : %.6f\n',BER);
+
+%% Waveforms
+
+figure
+
+subplot(4,1,1)
+
+stairs(bits,'LineWidth',2)
+
+title('Binary Data')
+
+ylim([-0.5 1.5])
+
+grid on
+
+subplot(4,1,2)
+
+plot(time,nrz)
+
+title('NRZ Signal')
+
+grid on
+
+subplot(4,1,3)
+
+plot(time,bpsk)
+
+title('BPSK Modulated Signal')
+
+grid on
+
+subplot(4,1,4)
+
+plot(time,filtered)
+
+title('Received Signal')
+
+grid on
+
+%% FFT
+
+figure
+
+plot(frequency,FFT)
+
+title('Frequency Spectrum')
+
+xlabel('Frequency (Hz)')
+
+ylabel('Magnitude')
+
+grid on
+
+%% Eye Diagram
+
+figure
+
+eyediagram(filtered(1:8000),200)
+
+title('Eye Diagram')
+
+%% Constellation
+
+figure
+
+scatter(real(filtered(1:20:end)),imag(hilbert(filtered(1:20:end))))
+
+title('Constellation Diagram')
+
+xlabel('In-phase')
+
+ylabel('Quadrature')
+
+grid on
+
+%% PSD
+
+figure
+
+pwelch(filtered)
+
+title('Power Spectral Density')
+
+%% Histogram
+
+figure
+
+histogram(filtered,40)
+
+title('Signal Amplitude Distribution')
+
+%% Save Results
+
+Result=table(signalPower,...
+noisePower,...
+SNR,...
+BER);
+
+writetable(Result,'TelecomSignalReport.xlsx');
+
+disp('Report Saved Successfully')
