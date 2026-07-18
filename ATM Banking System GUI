@@ -1,0 +1,249 @@
+A MATLAB ATM Banking System with GUI is typically a 600–1500 line project built using MATLAB App Designer or GUIDE. Below is a menu-driven version that demonstrates the core ATM operations. You can later convert it into a GUI by replacing the command-line inputs with buttons and text fields.
+
+clc;
+clear;
+close all;
+
+%% ATM BANKING SYSTEM
+
+balance = 10000;
+pin = 1234;
+transactions = [];
+
+disp('======================================');
+disp('        ATM BANKING SYSTEM');
+disp('======================================');
+
+userPin = input('Enter your 4-digit PIN: ');
+
+if userPin ~= pin
+    disp('Invalid PIN. Access Denied.');
+    return;
+end
+
+while true
+
+    disp(' ');
+    disp('========== MAIN MENU ==========');
+    disp('1. Balance Inquiry');
+    disp('2. Deposit');
+    disp('3. Withdraw');
+    disp('4. Mini Statement');
+    disp('5. Change PIN');
+    disp('6. Exit');
+
+    choice = input('Enter your choice: ');
+
+    switch choice
+
+        case 1
+            fprintf('\nCurrent Balance: Rs %.2f\n', balance);
+
+        case 2
+
+            amount = input('Enter Deposit Amount: ');
+
+            if amount <= 0
+                disp('Invalid Amount');
+            else
+                balance = balance + amount;
+                transactions = [transactions; amount];
+                fprintf('Deposit Successful\n');
+                fprintf('Updated Balance: Rs %.2f\n', balance);
+            end
+
+        case 3
+
+            amount = input('Enter Withdrawal Amount: ');
+
+            if amount > balance
+                disp('Insufficient Balance');
+            elseif amount <= 0
+                disp('Invalid Amount');
+            else
+                balance = balance - amount;
+                transactions = [transactions; -amount];
+                fprintf('Withdrawal Successful\n');
+                fprintf('Remaining Balance: Rs %.2f\n', balance);
+            end
+
+        case 4
+
+            disp(' ');
+            disp('----- MINI STATEMENT -----');
+
+            if isempty(transactions)
+                disp('No Transactions Available');
+            else
+                for i = 1:length(transactions)
+
+                    if transactions(i) > 0
+                        fprintf('%d. Deposit     +Rs %.2f\n', ...
+                            i, transactions(i));
+                    else
+                        fprintf('%d. Withdrawal -Rs %.2f\n', ...
+                            i, abs(transactions(i)));
+                    end
+
+                end
+            end
+
+            fprintf('Current Balance: Rs %.2f\n', balance);
+
+        case 5
+
+            oldPin = input('Enter Current PIN: ');
+
+            if oldPin == pin
+
+                newPin = input('Enter New PIN: ');
+
+                confirmPin = input('Confirm New PIN: ');
+
+                if newPin == confirmPin
+                    pin = newPin;
+                    disp('PIN Changed Successfully');
+                else
+                    disp('PIN Mismatch');
+                end
+
+            else
+                disp('Incorrect Current PIN');
+            end
+
+        case 6
+
+            disp(' ');
+            disp('Thank You for Using Our ATM');
+            break;
+
+        otherwise
+
+            disp('Invalid Choice');
+
+    end
+
+endclc;
+clear;
+close all;
+
+%% ATM BANKING SYSTEM
+
+balance = 10000;
+pin = 1234;
+transactions = [];
+
+disp('======================================');
+disp('        ATM BANKING SYSTEM');
+disp('======================================');
+
+userPin = input('Enter your 4-digit PIN: ');
+
+if userPin ~= pin
+    disp('Invalid PIN. Access Denied.');
+    return;
+end
+
+while true
+
+    disp(' ');
+    disp('========== MAIN MENU ==========');
+    disp('1. Balance Inquiry');
+    disp('2. Deposit');
+    disp('3. Withdraw');
+    disp('4. Mini Statement');
+    disp('5. Change PIN');
+    disp('6. Exit');
+
+    choice = input('Enter your choice: ');
+
+    switch choice
+
+        case 1
+            fprintf('\nCurrent Balance: Rs %.2f\n', balance);
+
+        case 2
+
+            amount = input('Enter Deposit Amount: ');
+
+            if amount <= 0
+                disp('Invalid Amount');
+            else
+                balance = balance + amount;
+                transactions = [transactions; amount];
+                fprintf('Deposit Successful\n');
+                fprintf('Updated Balance: Rs %.2f\n', balance);
+            end
+
+        case 3
+
+            amount = input('Enter Withdrawal Amount: ');
+
+            if amount > balance
+                disp('Insufficient Balance');
+            elseif amount <= 0
+                disp('Invalid Amount');
+            else
+                balance = balance - amount;
+                transactions = [transactions; -amount];
+                fprintf('Withdrawal Successful\n');
+                fprintf('Remaining Balance: Rs %.2f\n', balance);
+            end
+
+        case 4
+
+            disp(' ');
+            disp('----- MINI STATEMENT -----');
+
+            if isempty(transactions)
+                disp('No Transactions Available');
+            else
+                for i = 1:length(transactions)
+
+                    if transactions(i) > 0
+                        fprintf('%d. Deposit     +Rs %.2f\n', ...
+                            i, transactions(i));
+                    else
+                        fprintf('%d. Withdrawal -Rs %.2f\n', ...
+                            i, abs(transactions(i)));
+                    end
+
+                end
+            end
+
+            fprintf('Current Balance: Rs %.2f\n', balance);
+
+        case 5
+
+            oldPin = input('Enter Current PIN: ');
+
+            if oldPin == pin
+
+                newPin = input('Enter New PIN: ');
+
+                confirmPin = input('Confirm New PIN: ');
+
+                if newPin == confirmPin
+                    pin = newPin;
+                    disp('PIN Changed Successfully');
+                else
+                    disp('PIN Mismatch');
+                end
+
+            else
+                disp('Incorrect Current PIN');
+            end
+
+        case 6
+
+            disp(' ');
+            disp('Thank You for Using Our ATM');
+            break;
+
+        otherwise
+
+            disp('Invalid Choice');
+
+    end
+
+end
