@@ -1,0 +1,262 @@
+Below is a Student Result Management System in MATLAB. It is a 200+ line menu-driven project that manages student records, calculates grades, computes CGPA, ranks students, and exports the results to Excel.
+
+clc;
+clear;
+close all;
+
+%% STUDENT RESULT MANAGEMENT SYSTEM
+
+students = {};
+
+while true
+
+clc
+
+disp('==========================================');
+disp(' STUDENT RESULT MANAGEMENT SYSTEM');
+disp('==========================================');
+
+disp('1. Add Student');
+disp('2. View Students');
+disp('3. Search Student');
+disp('4. Generate Rank List');
+disp('5. Export Report');
+disp('6. Exit');
+
+choice=input('Enter Choice : ');
+
+switch choice
+
+%% Add Student
+
+case 1
+
+name=input('Student Name : ','s');
+roll=input('Roll Number : ');
+branch=input('Branch : ','s');
+
+m1=input('Mathematics : ');
+m2=input('Physics : ');
+m3=input('Chemistry : ');
+m4=input('Programming : ');
+m5=input('Electronics : ');
+
+total=m1+m2+m3+m4+m5;
+
+average=total/5;
+
+if average>=90
+    grade='A';
+elseif average>=80
+    grade='B';
+elseif average>=70
+    grade='C';
+elseif average>=60
+    grade='D';
+elseif average>=50
+    grade='E';
+else
+    grade='F';
+end
+
+cgpa=(average/10);
+
+students(end+1,:)={roll,name,branch,m1,m2,m3,m4,m5,...
+total,average,grade,cgpa};
+
+disp('Student Added Successfully')
+pause
+
+%% View Students
+
+case 2
+
+clc
+
+disp('--------------- STUDENT DETAILS ----------------')
+
+if isempty(students)
+
+disp('No Records Found')
+
+else
+
+for i=1:size(students,1)
+
+fprintf('\n');
+
+fprintf('Roll No : %d\n',students{i,1});
+
+fprintf('Name : %s\n',students{i,2});
+
+fprintf('Branch : %s\n',students{i,3});
+
+fprintf('Total : %.2f\n',students{i,9});
+
+fprintf('Average : %.2f\n',students{i,10});
+
+fprintf('Grade : %s\n',students{i,11});
+
+fprintf('CGPA : %.2f\n',students{i,12});
+
+end
+
+end
+
+pause
+
+%% Search Student
+
+case 3
+
+roll=input('Enter Roll Number : ');
+
+found=0;
+
+for i=1:size(students,1)
+
+if students{i,1}==roll
+
+found=1;
+
+fprintf('\n');
+
+fprintf('Student Name : %s\n',students{i,2});
+
+fprintf('Branch : %s\n',students{i,3});
+
+fprintf('Total : %.2f\n',students{i,9});
+
+fprintf('Average : %.2f\n',students{i,10});
+
+fprintf('Grade : %s\n',students{i,11});
+
+fprintf('CGPA : %.2f\n',students{i,12});
+
+end
+
+end
+
+if found==0
+
+disp('Student Not Found')
+
+end
+
+pause
+
+%% Rank List
+
+case 4
+
+if isempty(students)
+
+disp('No Data')
+
+pause
+
+continue
+
+end
+
+avg=zeros(size(students,1),1);
+
+for i=1:size(students,1)
+
+avg(i)=students{i,10};
+
+end
+
+[~,index]=sort(avg,'descend');
+
+clc
+
+disp('============= RANK LIST =============')
+
+for i=1:length(index)
+
+k=index(i);
+
+fprintf('Rank %d : %s (%.2f%%)\n',...
+i,...
+students{k,2},...
+students{k,10});
+
+end
+
+pause
+
+%% Export Report
+
+case 5
+
+if isempty(students)
+
+disp('No Records')
+
+pause
+
+continue
+
+end
+
+Roll=[];
+
+Name={};
+
+Branch={};
+
+Total=[];
+
+Average=[];
+
+Grade={};
+
+CGPA=[];
+
+for i=1:size(students,1)
+
+Roll(end+1)=students{i,1};
+
+Name{end+1}=students{i,2};
+
+Branch{end+1}=students{i,3};
+
+Total(end+1)=students{i,9};
+
+Average(end+1)=students{i,10};
+
+Grade{end+1}=students{i,11};
+
+CGPA(end+1)=students{i,12};
+
+end
+
+Result=table(Roll',Name',Branch',Total',Average',...
+Grade',CGPA',...
+'VariableNames',...
+{'RollNo','Name','Branch','Total','Average','Grade','CGPA'});
+
+writetable(Result,'StudentResult.xlsx');
+
+disp('Excel Report Generated')
+
+pause
+
+%% Exit
+
+case 6
+
+disp('Thank You')
+
+break
+
+otherwise
+
+disp('Invalid Choice')
+
+pause
+
+end
+
+end
